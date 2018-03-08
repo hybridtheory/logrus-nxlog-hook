@@ -1,7 +1,6 @@
 # NXLog Hook for [Logrus](https://github.com/sirupsen/logrus)
 
-[![Build Status](https://travis-ci.org/affectv/logrus-nxlog-hook.svg?branch=master)]
-(https://travis-ci.org/affectv/logrus-nxlog-hook)
+[![Build Status](https://travis-ci.org/affectv/logrus-nxlog-hook.svg?branch=master)](https://travis-ci.org/affectv/logrus-nxlog-hook)
 
 This logrus hook allows sending logs to your [NXLog](https://nxlog.co/) instance over
 any of the protocols the server supports.
