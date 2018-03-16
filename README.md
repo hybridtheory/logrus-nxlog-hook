@@ -46,7 +46,7 @@ See the [Examples](#Examples) section for other setups.
 This hook allows setting the minimum logging level which
 will trigger the forwarding of the messages.
 
-You can specify it with `Level`
+You can specify it with `Level`.
 
 e.g.
 
@@ -61,7 +61,7 @@ func main() {
 
 ### Specifying the Format
 
-The default logging formatter is JSON, but you can change it as follows, using `Formatter`
+The default logging formatter is JSON, but you can change it as follows, using `Formatter`.
 
 e.g.
 
