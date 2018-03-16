@@ -1,9 +1,9 @@
-# [NXLog](https://logrus.co/) Hook for [Logrus](https://github.com/sirupsen/logrus) <img src="http://i.imgur.com/hTeVwmJ.png" width="40" height="40" alt=":walrus:" class="emoji" title=":walrus:"/>
+# [NXLog](https://nxlog.co/) Hook for [Logrus](https://github.com/sirupsen/logrus) <img src="http://i.imgur.com/hTeVwmJ.png" width="40" height="40" alt=":walrus:" class="emoji" title=":walrus:"/>
 
 [![GoDoc](https://godoc.org/github.com/nathany/looper?status.svg)](https://godoc.org/github.com/affectv/logrus-nxlog-hook)
 [![Build Status](https://travis-ci.org/affectv/logrus-nxlog-hook.svg?branch=master)](https://travis-ci.org/affectv/logrus-nxlog-hook)
 
-This [Logrus](https://github.com/sirupsen/logrus) hook allows sending logs to a [NXLog](https://logrus.co/) server.
+This [Logrus](https://github.com/sirupsen/logrus) hook allows sending logs to a [NXLog](https://nxlog.co/) server.
 
 ## Configuration
 
