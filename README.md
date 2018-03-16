@@ -1,20 +1,26 @@
-# NXLog Hook for [Logrus](https://github.com/sirupsen/logrus)
+# [NXLog](https://nxlog.co/) Hook for [Logrus](https://github.com/sirupsen/logrus) <img src="http://i.imgur.com/hTeVwmJ.png" width="40" height="40" alt=":walrus:" class="emoji" title=":walrus:"/>
 
+[![GoDoc](https://godoc.org/github.com/nathany/looper?status.svg)](https://godoc.org/github.com/affectv/logrus-nxlog-hook)
 [![Build Status](https://travis-ci.org/affectv/logrus-nxlog-hook.svg?branch=master)](https://travis-ci.org/affectv/logrus-nxlog-hook)
 
-This logrus hook allows sending logs to your [NXLog](https://nxlog.co/) instance over
-any of the protocols the server supports.
+This [Logrus](https://github.com/sirupsen/logrus) hook allows sending logs to a [NXLog](https://nxlog.co/) server.
+
+## Configuration
+
+The hook must be configured with:
+
+* The protocol NXLog is using (`tcp`, `udp`, `ssl` or `unixgram`)
+* The endpoint where NXLog is listening to:
+    * As an `"ip:port"` or `"hostname:port"` string, in case of an IP protocol.
+    * or as a valid `path`, in case of UDS.
 
 ## Usage
 
-We are using the standard net package, so in order to use this logrus hook
-we will need to provide:
+After importing the `logrus-nxlog-hook` package, you can create a new hook with:
 
-* A protocol where NXLog is listening (`tcp`, `udp`, `ssl` or `unixgram`)
-* The endpoint where NXLog is listening ("ip:port" string in case of an ip protocol
-or a valid path in case of uds)
+`NewNxlogHook([PROTOCOL], [ENDPOINT], [OPTIONAL_TLS_CONFIGURATION])`
 
-The hook must be configured with:
+For example, for a TCP setup:
 
 ```go
 package main
@@ -25,89 +31,88 @@ import (
 )
 
 func main() {
-  hook := nxlog.NewNxlogHook("tcp", "ip:port", nil)
-  log.AddHook(hook)
-  log.Info("info message to be logged")
+  nxlogHook, err := nxlog.NewNxlogHook("tcp", "127.0.0.1:514", nil)
+  if err == nil {
+    log.AddHook(nxlogHook)
+  }
+  log.Info("Hello World")
 }
 ```
 
-### Filter by level
+See the [Examples](#Examples) section for other setups.
 
-NXLog allows us to filter for certain levels, but maybe we want not to send them
-in the first place. So the hook allows setting the minimum logging level that
-will trigger this hook to forward the messages.
+### Filtering by Level
+
+This hook allows setting the minimum logging level which
+will trigger the forwarding of the messages.
+
+You can specify it with `Level`.
+
+e.g.
 
 ```go
 func main() {
-  hook, _ := nxlog.NewNxlogHook("tcp", "ip:port", nil)
-  hook.Level = log.InfoLevel
-  log.AddHook(hook)
-  log.Info("info message to be logged")
+  nxlogHook, _ := nxlog.NewNxlogHook("tcp", "127.0.0.1:514", nil)
+  nxlogHook.Level = log.InfoLevel
+  log.AddHook(nxlogHook)
+  log.Info("Info message to be logged")
 }
 ```
 
-### Specify formatting
+### Specifying the Format
 
-The default logging formatter is JSON (which NXLog is able to decode easily
-to append new variables, remove them, etc.).
+The default logging formatter is JSON, but you can change it as follows, using `Formatter`.
 
-We can change the formatter as follows:
+e.g.
 
 ```go
 func main() {
-  hook, _ := nxlog.NewNxlogHook("tcp", "ip:port", nil)
-  hook.Formatter = &log.TextFormatter{}
-  log.AddHook(hook)
-  log.Info("info message to be logged")
+  nxlogHook, _ := nxlog.NewNxlogHook("tcp", "127.0.0.1:514", nil)
+  nxlogHook.Formatter = &log.TextFormatter{}
+  log.AddHook(nxlogHook)
+  log.Info("Info message to be logged")
 }
 ```
 
-## Examples
+## <a name="Examples"></a>Examples
 
 Some examples of how to use the plugin are the following:
 
-### TCP connections
+### TCP Connection
 
-This plugin allows to connect with NXLog via the `im_tcp` module.
+Specify `tcp` and a `"host:port"` string to `NewNxlogHook`.
 
-```go
-func main() {
-  hook, err := nxlog.NewNxlogHook("tcp", "ip:port", nil)
-  if err == nil {
-    log.AddHook(hook)
-  }
-  log.Info("tcp info message to be logged")
-}
-```
-
-### UDP connections
-
-This plugin allows to connect with NXLog via the `im_udp` module.
+e.g.
 
 ```go
 func main() {
-  hook, err := nxlog.NewNxlogHook("udp", "ip:port", nil)
-  if err == nil {
-    log.AddHook(hook)
-  }
-  log.Info("udp info message to be logged")
+  nxlogHook, _ := nxlog.NewNxlogHook("tcp", "127.0.0.1:514", nil)
+  log.AddHook(nxlogHook)
+  log.Info("TCP info message to be logged")
 }
 ```
 
-### SSL connections
+### UDP Connection
 
-This plugin allows to connect with NXLog via the `im_ssl` module.
+Specify `udp` and a `"host:port"` string to `NewNxlogHook`.
 
-In order to test the behaviour, we are adding the steps to have NXLog `im_ssl`
-up and running with a basic SSL configuration.
+```go
+func main() {
+  nxlogHook, _ := nxlog.NewNxlogHook("udp", "127.0.0.1:514", nil)
+  log.AddHook(nxlogHook)
+  log.Info("UDP info message to be logged")
+}
+```
 
-First we can create a compatible SSL certificate with:
+### SSL Connection
+
+Please remember you should have a compatible SSL certificate available to use. If you don't have it, you can create one with:
 
 ```bash
 openssl req -newkey rsa:2048 -nodes -keyout sample-key.pem -x509 -days 365 -out sample-certificate.pem
 ```
 
-Then we can configure NXLog to accept connections via SSL with:
+You must ensure NXLog is configured to accept Connections via SSL as well. The SSL certificate files should be included in the following section of the `nxlog.conf` file:
 
 ```xml
 <Input in_ssl>
@@ -120,8 +125,7 @@ Then we can configure NXLog to accept connections via SSL with:
 </Input>
 ```
 
-To be able to send messages to the SSL listener, we must pass the TLS configuration
-specifying a client's certificate as well:
+Now you are ready to connect via SSL. Specify `ssl` and a `"host:port"` string to `NewNxlogHook`.
 
 ```go
 import (
@@ -135,35 +139,31 @@ func main() {
 		"%CERTCLIENT%/sample-certificate.pem",
 		"%CERTCLIENT%/sample-key.pem",
 	)
-  hook, err := nxlog.NewNxlogHook("ssl", "ip:port", &tls.Config{
+  nxlogHook, _ := nxlog.NewNxlogHook("ssl", "127.0.0.1:514", &tls.Config{
     InsecureSkipVerify: true,
     Certificates: []tls.Certificate{certificate},
-  })  
-  if err == nil {
-    log.AddHook(hook)
-  }
-  log.Info("ssl info message to be logged")
+  })
+  log.AddHook(nxlogHook)
+  log.Info("SSL info message to be logged")
 }
 ```
 
-### UDS connections
+### UDS Connection
 
-This plugin allows to connect with NXLog via the im_uds module.
+Specify `unixgram` and `"path"` string to `NewNxlogHook`.
 
 ```go
 func main() {
-  hook, err := nxlog.NewNxlogHook("unixgram", "/var/run/nxlog/devlog", nil)
-  if err == nil {
-    log.AddHook(hook)
-  }
-  log.Info("uds info message to be logged")
+  nxlogHook, _ := nxlog.NewNxlogHook("unixgram", "/var/run/nxlog/devlog", nil)
+  log.AddHook(nxlogHook)
+  log.Info("UDS info message to be logged")
 }
 ```
 
-## Testing
+## Plugin Development and Testing
 
-To execute the plugin tests we have the [ginkgo](https://github.com/onsi/ginkgo)
-and [gomega](https://github.com/onsi/gomega) dependencies.
+This plugin was developed using [ginkgo](https://github.com/onsi/ginkgo)
+and [gomega](https://github.com/onsi/gomega) test frameworks.
 
 To execute the tests:
 
