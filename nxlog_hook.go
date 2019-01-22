@@ -21,7 +21,7 @@ func NewNxlogHook(protocol string, endpoint string, options interface{}) (*Hook,
 	}
 
 	hook := &Hook{
-		Level:     logrus.DebugLevel,
+		Level:     logrus.TraceLevel,
 		Formatter: &logrus.JSONFormatter{},
 		writer:    *writer,
 	}
